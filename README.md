@@ -11,7 +11,7 @@ Some expert assembly will likely be required with these SystemTap tools. Also se
 
 SystemTap is in-development kernel-level software, so **there is the possibility of kernel panics or freezes**. I've developed these for use in a lab environment, where panics can be tolerated.
 
-Also, tools that use dynamic tracing may either not work at all (print errors), or work and show bogus data, or work and show plausible but still incorrect data. The same is true for any dynamic tracing-based scripts (including my DTrace ones).
+Also, tools that use the inherently unstable dynamic tracing interface may either not work at all (print errors), or work and show bogus data, or work and show plausible but still incorrect data. The same is true for any dynamic tracing-based scripts (including my DTrace ones).
 
 Note that the panics may be due to SystemTap or other kernel origins. Use crash dump analysis to determine the real cause, and please [report bugs](https://sourceware.org/systemtap/wiki/HowToReportBugs).
 
