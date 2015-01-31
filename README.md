@@ -33,6 +33,88 @@ Where possible, these tools avoid the requirement of having kernel debuginfo, wh
 
 There are also man pages under [man/man8](man/man8).
 
+## Screenshots
+
+Histogram of syscall writes by requested size (one-liner):
+
+<pre># <b>stap -e 'global a; probe nd_syscall.write { a &lt;&lt;&lt; int_arg(3); } probe end { print(@hist_log(a)); }'</b>
+^Cvalue |-------------------------------------------------- count
+    0 |                                                    0
+    1 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                35
+    2 |@                                                   1
+    4 |@                                                   1
+    8 |                                                    0
+   16 |@@@@@@@@@@@@@@@@@@@@@@                             22
+   32 |@@@@@@@@@@@@@@@                                    15
+   64 |@@@@@@@@@@@@@@@@@                                  17
+  128 |@@                                                  2
+  256 |@@                                                  2
+  512 |                                                    0
+ 1024 |                                                    0
+</pre>
+
+Tracing exec() syscalls to show new process execution:
+
+<pre># <b>./execsnoop-nd.stp</b>
+TIME                        UID   PPID    PID           COMM ARGS
+Sat Jan 31 20:39:37 2015      0    878   5744           sshd /usr/sbin/sshd -R
+Sat Jan 31 20:39:38 2015      0   5744   5746           bash -bash
+Sat Jan 31 20:39:38 2015      0   5747   5748             id id -un
+Sat Jan 31 20:39:38 2015      0   5749   5750       hostname /bin/hostname
+Sat Jan 31 20:39:38 2015      0   5751   5752            tty tty -s
+Sat Jan 31 20:39:38 2015      0   5751   5753           tput tput colors
+Sat Jan 31 20:39:38 2015      0   5754   5755      dircolors dircolors --sh /etc/DIR_COLORS.256color
+Sat Jan 31 20:39:38 2015      0   5746   5756           grep grep -qi ^COLOR.*none /etc/DIR_COLORS.256color
+Sat Jan 31 20:39:40 2015      0   5746   5757             ls ls --color=auto
+Sat Jan 31 20:39:40 2015      0   5746   5758           date date
+</pre>
+
+Tracing open() syscalls with process and pathnames:
+
+<pre># <b>./opensnoop-nd.stp</b>
+   UID    PID             COMM   FD PATH
+     0  13858           iostat    3 /etc/ld.so.cache
+     0  13858           iostat    3 /lib64/libc.so.6
+     0  13858           iostat    3 /usr/lib/locale/locale-archive
+     0  13858           iostat    3 /sys/devices/system/cpu
+     0  13858           iostat    3 /proc/diskstats
+     0  13858           iostat    3 /etc/localtime
+     0  13858           iostat    3 /proc/uptime
+     0  13858           iostat    3 /proc/stat
+     0  13858           iostat    3 /proc/diskstats
+     0  13858           iostat    4 /etc/sysconfig/sysstat.ioconf
+     0  13858           iostat    3 /proc/uptime
+     0  13858           iostat    3 /proc/stat
+     0  13858           iostat    3 /proc/diskstats
+[...]
+</pre>
+
+Summarizing read() and write() syscall latency for processes named "node":
+
+<pre># <b>./rwtime-nd.stp node</b>
+Tracing read/write syscalls for processes named "node"... Hit Ctrl-C to end.
+^C
+syscall read latency (ns):
+value |-------------------------------------------------- count
+  512 |                                                     0
+ 1024 |                                                     0
+ 2048 |                                                     2
+ 4096 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     278
+ 8192 |                                                     1
+16384 |                                                     5
+32768 |                                                     0
+65536 |                                                     0
+
+syscall write latency (ns):
+ value |-------------------------------------------------- count
+  4096 |                                                     0
+  8192 |                                                     0
+ 16384 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      135
+ 32768 |@@                                                   8
+ 65536 |                                                     0
+131072 |                                                     0
+</pre>
+
 ## Internals
 
 These tools are designed to be short, simple, and documented. Each tool has an examples file under [examples](examples), a man page under [man/man8](man/man8), a symlink in [bin](bin), and a link in this README.
