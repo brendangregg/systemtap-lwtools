@@ -1,6 +1,8 @@
 #
 # SystemTap Lightweight One-Liners
 #
+# Drop the "-v" to elide the debug information about phase execution.
+#
 
 # Trace new processes (via exec() only), showing arguments:
 stap -ve 'probe nd_syscall.execve.return { println(cmdline_str(); }'
@@ -52,3 +54,6 @@ stap -ve 'global a; probe perf.sw.page_faults_maj { a[execname()] <<< 1; }'
 
 # Count IRQs by device name and IRQ:
 stap -ve 'global a; probe irq_handler.entry { a[kernel_string(dev_name), irq] <<< 1; }'
+
+# Histogram of kernel vfs_read() calls by requested size:
+stap -ve 'global a; probe kprobe.function("vfs_read") { a <<< int_arg(3); } probe end { print(@hist_log(a)); }'
