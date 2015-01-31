@@ -4,8 +4,8 @@
  *			For Linux, uses SystemTap (non-debuginfo).
  *
  * This is useful for identifying new process creation, provided it follows the
- * fork()->exec() sequence. New processes that only fork will not be seen; use
- * newproc.stp instead.
+ * fork()->exec() sequence. New processes that only fork will not be seen; catch
+ * those by tracing fork() or using the process.begin probe.
  *
  * USAGE: ./execsnoop-nd.stp
  *
