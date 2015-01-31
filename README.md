@@ -117,7 +117,7 @@ syscall write latency (ns):
 
 ## Internals
 
-These tools are designed to be short, simple, and documented. Each tool has an examples file under [examples](examples), a man page under [man/man8](man/man8), a symlink in [bin](bin), and a link in this README.
+These tools are designed to be short, simple, and documented, and use as few SystemTap capabilities as possible. They also avoid using kernel debuginfo, so that these scripts can be used in environments that lack it (eg, cloud instances that are created and destroyed quickly, where including debuginfo can be onerous). Each tool has an examples file under [examples](examples), a man page under [man/man8](man/man8), a symlink in [bin](bin), and a link in this README.
 
 ## See Also
 
