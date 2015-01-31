@@ -1,9 +1,9 @@
 #!/usr/bin/stap
 /*
- * syscallbypid.d	Count syscalls with process details.
+ * syscallbypid-nd.d	Count syscalls with process details.
  *			For Linux, uses SystemTap (non-debuginfo).
  *
- * USAGE: ./syscallbypid.d
+ * USAGE: ./syscallbypid-nd.d
  *
  * Copyright (C) 2015 Brendan Gregg.
  *
@@ -29,13 +29,13 @@ probe begin
 
 probe nd_syscall.*.return
 {
-	num[pid(), execname(), ppfunc()] <<< 1;
+	num[pid(), execname(), name] <<< 1;
 }
 
 probe end
 {
 	printf("\n%-8s %-16s %-24s %8s\n", "PID", "CMD", "SYSCALL", "COUNT");
-	foreach ([p, e, f] in num+) {
-		printf("%-8d %-16s %-24s %8d\n", p, e, f, @count(num[p, e, f]));
+	foreach ([p, e, n] in num+) {
+		printf("%-8d %-16s %-24s %8d\n", p, e, n, @count(num[p, e, n]));
 	}
 }
