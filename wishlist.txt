@@ -2,5 +2,9 @@ SystemTap Wishlist
 
 These are desired functionality for an environment without kernel debuginfo.
 
-- A file descriptor to pathname routine, without needing kernel debuginfo. Eg, the paths from /proc/PID/fd/*.
-- kernel.function() probes, without needing kernel debuginfo. See https://github.com/brendangregg/perf-tools/blob/master/examples/kprobe_example.txt, for an example of what I'd like to do, and note that that example, using ftrace/kprobe, works currently without kernel debuginfo.
+- A file descriptor to pathname routine, without needing kernel debuginfo. Eg,
+  the paths from /proc/PID/fd/*.
+- kernel.function() probes, without needing kernel debuginfo. See
+  https://github.com/brendangregg/perf-tools/blob/master/examples/kprobe_example.txt
+  for an example of what I'd like to do, and note that that example, using
+  ftrace/kprobe, works currently without kernel debuginfo.
