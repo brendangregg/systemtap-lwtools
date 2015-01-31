@@ -121,4 +121,4 @@ These tools are designed to be short, simple, and documented, and use as few Sys
 
 ## See Also
 
-For SystemTap tools that use its full capabilities, see the examples in the SystemTap source under share/doc/systemtap/examples. These are likely to require kernel debuginfo.
+For SystemTap tools that use its full capabilities, see the [SystemTap examples](http://sourceware.org/systemtap/examples) page, particularly the "best examples" section, as well as the examples in the SystemTap source under share/doc/systemtap/examples. Most of these are likely to require kernel debuginfo.
