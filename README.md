@@ -9,15 +9,15 @@ Some expert assembly will likely be required with these SystemTap tools. Also se
 
 ## Warnings
 
-SystemTap is in-development kernel-level software, so **there is the possibility of kernel panics or freezes**. I've developed these for study of simulated issues in a lab environment, where panics can be tolerated.
+SystemTap is in-development kernel-level software, so **there is the possibility of kernel panics or freezes**. I've developed these for use in a lab environment, where panics can be tolerated.
 
-Also, since dynamic tracing-based tools use an inherently unstable interface, these may either not work at all (print errors), or work and show obviously bogus values, or work and show plausible but still incorrect values. The same is true for any dynamic tracing-based scripts (including my DTrace ones).
+Also, tools that use dynamic tracing may either not work at all (print errors), or work and show bogus data, or work and show plausible but still incorrect data. The same is true for any dynamic tracing-based scripts (including my DTrace ones).
 
-Note that the panics are not necessarily due to SystemTap itself, but may be due to it exercising bugs in typically dormant kernel code. Use crash dump analysis to determine the real cause, and please [report bugs](https://sourceware.org/systemtap/wiki/HowToReportBugs).
+Note that the panics may be due to SystemTap or other kernel origins. Use crash dump analysis to determine the real cause, and please [report bugs](https://sourceware.org/systemtap/wiki/HowToReportBugs).
 
 ## Prerequisites
 
-SystemTap, which provides the stap command, and an environment that is fault tolerant (see Warnings). It's **strongly** recommended that you try the latest version of SystemTap, which probably means fetching and compiling from source. See git://sourceware.org/git/systemtap.git, and the [build readme](https://sourceware.org/git/?p=systemtap.git;a=blob_plain;f=README;hb=HEAD).
+SystemTap, for the stap command, and an environment that is fault tolerant (see Warnings). It is **strongly** recommended that you try the latest version of SystemTap, which probably means compiling from source. See git://sourceware.org/git/systemtap.git, and the [build readme](https://sourceware.org/git/?p=systemtap.git;a=blob_plain;f=README;hb=HEAD).
 
 Where possible, these tools avoid the requirement of having kernel debuginfo, which can be onerous in cloud environments. This may obfuscate and complicate some scripts.
 
@@ -35,7 +35,7 @@ There are also man pages under [man/man8](man/man8).
 
 ## Internals
 
-These tools are designed to be short, simple, and documented, since it is expected that they will need to be revisited, understood, and adjusted to match developments in SystemTap and the target software.
+These tools are designed to be short, simple, and documented. Each tool has an examples file under [examples](examples), a man page under [man/man8](man/man8), a symlink in [bin](bin), and a link in this README.
 
 ## See Also
 
