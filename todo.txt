@@ -1,0 +1,6 @@
+https://sourceware.org/systemtap/tapsets/
+
+do off-CPU time using:
+stap -ve 'global a; probe scheduler.cpu_off { a[task_prev, task_next] <<< 1; }'
+
+cp perf-tools/syscount to systemtap-tools, and edit

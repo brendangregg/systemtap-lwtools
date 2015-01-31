@@ -1,0 +1,54 @@
+#
+# SystemTap Lightweight One-Liners
+#
+
+# Trace new processes (via exec() only), showing arguments:
+stap -ve 'probe nd_syscall.execve.return { println(cmdline_str(); }'
+
+# Trace new processes (via exec() only), showing time and arguments:
+stap -ve 'probe nd_syscall.execve.return { printf("%s %s\n", ctime(gettimeofday_s()), cmdline_str()); }'
+
+# Trace file open()s with process name and filename (if faulted):
+stap -ve 'probe nd_syscall.open { printf("%s %s\n", execname(), filename); }'
+
+# Count syscalls by process name:
+stap -ve 'global a; probe nd_syscall.* { a[execname()] <<< 1; }'
+
+# Count syscalls by pid and process name:
+stap -ve 'global a; probe nd_syscall.* { a[pid(), execname()] <<< 1; }'
+
+# Count syscalls by syscall name:
+stap -ve 'global a; probe nd_syscall.* { a[name] <<< 1; }'
+
+# Count syscalls by syscall name, output formatted:
+stap -ve 'global a; probe nd_syscall.* { a[name] <<< 1; } probe end { foreach (s in a+) { printf("%-16s %8d\n", s, @count(a[s])); } }'
+
+# Histogram of syscall reads by requested size:
+stap -ve 'global a; probe nd_syscall.read { a <<< int_arg(3); } probe end { print(@hist_log(a)); }'
+
+# Histogram of syscall writes by requested size:
+stap -ve 'global a; probe nd_syscall.write { a <<< int_arg(3); } probe end { print(@hist_log(a)); }'
+
+# Histogram of syscall reads by return value (bytes are > 0, errors are < 0):
+stap -ve 'global a; probe nd_syscall.read.return { a <<< returnval(); } probe end { print(@hist_log(a)); }'
+
+# Histogram of syscall read returns by size (bytes):
+stap -ve 'global a; probe nd_syscall.read.return { rval = returnval(); if (rval > 0) { a <<< rval; } } probe end { print(@hist_log(a)); }'
+
+# Histogram of read() syscall time, in nanoseconds:
+stap -ve 'global a; probe nd_syscall.read.return { a <<< gettimeofday_ns() - @entry(gettimeofday_ns()); } probe end { print(@hist_log(a)); }'
+
+# Histogram of write() syscall time, in nanoseconds:
+stap -ve 'global a; probe nd_syscall.write.return { a <<< gettimeofday_ns() - @entry(gettimeofday_ns()); } probe end { print(@hist_log(a)); }'
+
+# Trace storage I/O requests by process and size (bytes):
+stap -ve 'probe ioblock_trace.request { printf("%d %s %d\n", pid(), execname(), size); }'
+
+# Histogram of storage I/O request size (bytes):
+stap -ve 'global a; probe ioblock_trace.request { a <<< size; } probe end { print(@hist_log(a)); }'
+ 
+# Count major faults by process name:
+stap -ve 'global a; probe perf.sw.page_faults_maj { a[execname()] <<< 1; }'
+
+# Count IRQs by device name and IRQ:
+stap -ve 'global a; probe irq_handler.entry { a[kernel_string(dev_name), irq] <<< 1; }'
