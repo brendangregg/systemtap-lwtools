@@ -3,7 +3,7 @@ SystemTap Lightweight Tools (lwtools)
 
 A miscellaneous collection of in-development and unsupported SystemTap tools and one-liners, which use a limited set of SystemTap capabilities (lightweight). These provide advanced observability for the analysis of system and cloud performance. 
 
-An aim of this collection is to explore what SystemTap can do using basic features and without the need for kernel debuginfo, which can be an onerous requirement. For a similar set of ftrace- and perf\_events-based tools, see the [perf tools](https://github.com/brendangregg/perf-tools) collection, which is more developed.
+An aim of this collection is to explore what SystemTap can do using basic features and without the need for kernel debuginfo, which can be an onerous requirement. For a similar set of ftrace- and perf\_events-based tools, see the [perf tools](https://github.com/brendangregg/perf-tools) collection, which is more developed. An advantage of these SystemTap tools is that they can perform custom in-kernel aggregations (eg, latency distributions) with low overhead.
 
 Some expert assembly will likely be required with these SystemTap tools. Also see warnings.
 
