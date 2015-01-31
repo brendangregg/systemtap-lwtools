@@ -19,7 +19,7 @@ Note that the panics may be due to SystemTap or other kernel origins. Use crash 
 
 SystemTap, for the stap command, and an environment that is fault tolerant (see Warnings). It is **strongly** recommended that you try the latest version of SystemTap, which probably means compiling from source. See git://sourceware.org/git/systemtap.git, and the [build readme](https://sourceware.org/git/?p=systemtap.git;a=blob_plain;f=README;hb=HEAD).
 
-Where possible, these tools avoid the requirement of having kernel debuginfo, which can be onerous in cloud environments. This may obfuscate and complicate some scripts.
+Where possible, these tools avoid the requirement of having kernel debuginfo.
 
 ## Contents
 
@@ -117,7 +117,9 @@ syscall write latency (ns):
 
 ## Internals
 
-These tools are designed to be short, simple, and documented, and use as few SystemTap capabilities as possible. They also avoid using kernel debuginfo, so that these scripts can be used in environments that lack it (eg, cloud instances that are created and destroyed quickly, where including debuginfo can be onerous). Each tool has an examples file under [examples](examples), a man page under [man/man8](man/man8), a symlink in [bin](bin), and a link in this README.
+These tools are designed to be short, simple, and documented, and use as few SystemTap capabilities as possible. They also avoid using kernel debuginfo, so that these scripts can be used in environments that lack it (eg, cloud instances that are created and destroyed quickly, where including debuginfo can be onerous). This can complicate or obfuscate some scripts.
+
+Each tool has an examples file under [examples](examples), a man page under [man/man8](man/man8), a symlink in [bin](bin), and a link in this README.
 
 ## See Also
 
