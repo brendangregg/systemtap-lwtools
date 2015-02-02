@@ -1,0 +1,84 @@
+#!/usr/bin/stap
+/*
+ * biolatency-nd.stp	Measure storage (bio) latency distribution.
+ *			For Linux, uses SystemTap (non-debuginfo).
+ *
+ * USAGE: ./biolatency-nd.stp [interval [count]]
+ *
+ * This script uses kernel dynamic tracing of the submit_bio() and bio_endio()
+ * kernel functions, and their *bio arguments. If these functions are
+ * unavailable, unsuitable, or change for your kernel version, this script
+ * will need to be updated.
+ *
+ * From systemtap-lwtools: https://github.com/brendangregg/systemtap-lwtools
+ *
+ * See the corresponding man page (in systemtap-lwtools) for more info.
+ *
+ * Copyright (C) 2015 Brendan Gregg.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * 01-Feb-2015	Brendan Gregg	Created this.
+ */
+
+global ts[65536];	# 65536 is max concurrent I/O
+global lat, interval = 0, secs = 0, count = 0, output = 0;
+
+probe begin
+{
+	printf("Tracing block I/O... ");
+	if (argv_1 != "") {
+		interval = strtol(argv_1, 10);
+		if (argv_2 != "") {
+			count = strtol(argv_2, 10);
+		}
+		printf("Output every %d secs.\n", interval);
+	} else {
+		printf("Hit Ctrl-C to end.\n");
+	}
+}
+
+probe kprobe.function("submit_bio") {
+	ts[pointer_arg(2)] = gettimeofday_ns();
+}
+
+probe kprobe.function("bio_endio") {
+	bio = pointer_arg(1);
+	if (ts[bio]) {
+		lat <<< gettimeofday_ns() - ts[bio];
+		delete ts[bio];
+	}
+}
+
+function print_report()
+{
+	printf("\nbio latency (ns):\n");
+	if (@count(lat)) { print(@hist_log(lat)); }
+	delete lat;
+}
+
+probe timer.s(1)
+{
+	if (interval) {
+		if (++secs == interval) {
+			print_report();
+			secs = 0;
+			count && (++output == count) && exit();
+		}
+	}
+}
+
+probe end
+{
+	!interval && print_report();
+	delete secs;
+	delete output;
+}
