@@ -4,6 +4,12 @@
 # Drop the "-v" to elide the debug information about phase execution.
 #
 
+# List non-debuginfo syscall probes:
+stap -L 'nd_syscall.*'
+
+# List kernel tracepoint-based probes:
+stap -L 'kernel.trace("*")'
+
 # Trace new processes (via exec() only), showing arguments:
 stap -ve 'probe nd_syscall.execve.return { println(cmdline_str(); }'
 
@@ -55,5 +61,8 @@ stap -ve 'global a; probe perf.sw.page_faults_maj { a[execname()] <<< 1; }'
 # Count IRQs by device name and IRQ:
 stap -ve 'global a; probe irq_handler.entry { a[kernel_string(dev_name), irq] <<< 1; }'
 
-# Histogram of kernel vfs_read() calls by requested size:
+# Histogram of kernel vfs_read() calls, instrumented using dynamic tracing, by requested size:
 stap -ve 'global a; probe kprobe.function("vfs_read") { a <<< int_arg(3); } probe end { print(@hist_log(a)); }'
+
+# Count block I/O requests, using the block_rq_insert tracepoint, by process name:
+stap -ve 'global a; probe kernel.trace("block_rq_insert") { a[execname()] <<< 1; }'
