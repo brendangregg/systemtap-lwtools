@@ -61,7 +61,10 @@ stap -ve 'global a; probe perf.sw.page_faults_maj { a[execname()] <<< 1; }'
 # Count IRQs by device name and IRQ:
 stap -ve 'global a; probe irq_handler.entry { a[kernel_string(dev_name), irq] <<< 1; }'
 
-# Histogram of kernel vfs_read() calls, instrumented using dynamic tracing, by requested size:
+# Count kernel function calls beginning with "bio", using dynamic tracing:
+stap -ve 'global a; probe kprobe.function("bio*") { a[ppfunc()] <<< 1; }'
+
+# Histogram of kernel vfs_read() calls by requested size:
 stap -ve 'global a; probe kprobe.function("vfs_read") { a <<< int_arg(3); } probe end { print(@hist_log(a)); }'
 
 # Count block I/O requests, using the block_rq_insert tracepoint, by process name:
