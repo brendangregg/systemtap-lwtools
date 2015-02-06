@@ -29,6 +29,8 @@ Where possible, these tools avoid the requirement of having kernel debuginfo.
 - [killsnoop-nd.stp](killsnoop-nd.stp): trace kill() signals showing process and signal details. [Examples](examples/killsnoop-nd_example.txt).
 - [biolatency-nd.stp](biolatency-nd.stp): measure block I/O latency distribution. [Examples](examples/biolatency-nd_example.txt).
 - disk/[bitesize-nd.stp](disk/bitesize-nd.stp): measure block I/O size distribution. [Examples](examples/bitesize-nd_example.txt).
+- fs/[fslatency-nd.stp](fs/fslatency-nd.stp): measure file system sync read and write latency distribution. [Examples](examples/fslatency-nd_example.txt).
+- fs/[fsslower-nd.stp](fs/fsslower-nd.stp): trace slow file system sync reads and writes. [Examples](examples/fsslower-nd_example.txt).
 - net/[accept2close-nd.stp](net/accept2close-nd.stp): show socket lifespan, from accept() to close(). [Examples](examples/accept2close-nd_example.txt).
 - proc/[rwtime-nd.stp](proc/rwtime-nd.stp): summarize read() and write() latency. [Examples](examples/rwtime-nd_example.txt).
 - proc/[syscallbypid-nd.stp](proc/syscallbypid-nd.stp): count syscalls with process details. [Examples](examples/syscallbypid-nd_example.txt).
