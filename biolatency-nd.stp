@@ -5,10 +5,9 @@
  *
  * USAGE: ./biolatency-nd.stp [interval [count]]
  *
- * This script uses kernel dynamic tracing of the submit_bio() and bio_endio()
- * kernel functions, and their *bio arguments. If these functions are
- * unavailable, unsuitable, or change for your kernel version, this script
- * will need to be updated.
+ * This script uses the kernel tracepoints block_rq_issue and block_rq_complete,
+ * to trace the time from storage request to completion. To include extra time
+ * spent queued in the kernel, change block_rq_issue to block_rq_insert.
  *
  * From systemtap-lwtools: https://github.com/brendangregg/systemtap-lwtools
  *
@@ -46,15 +45,14 @@ probe begin
 	}
 }
 
-probe kprobe.function("submit_bio") {
-	ts[pointer_arg(2)] = gettimeofday_ns();
+probe kernel.trace("block_rq_issue") {
+	ts[$rq] = gettimeofday_ns();
 }
 
-probe kprobe.function("bio_endio") {
-	bio = pointer_arg(1);
-	if (ts[bio]) {
-		lat <<< gettimeofday_ns() - ts[bio];
-		delete ts[bio];
+probe kernel.trace("block_rq_complete") {
+	if (ts[$rq]) {
+		lat <<< gettimeofday_ns() - ts[$rq];
+		delete ts[$rq];
 	}
 }
 

@@ -10,10 +10,9 @@ distribution as a histogram. This can be useful to identify the characteristics
 of I/O latency, beyond the averages shown by iostat(1). For example, to study
 I/O latency outliers, or multi-modal distributions.
 
-This script uses kernel dynamic tracing of the submit_bio() and bio_endio()
-kernel functions, and their *bio arguments. If these functions are
-unavailable, unsuitable, or change for your kernel version, this script
-will need to be updated.
+This script uses the kernel tracepoints block_rq_issue and block_rq_complete,
+to trace the time from storage request to completion. To include extra time
+spent queued in the kernel, change block_rq_issue to block_rq_insert.
 .SH REQUIREMENTS
 SystemTap.
 .SH OPTIONS
