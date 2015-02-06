@@ -55,6 +55,12 @@ stap -ve 'probe ioblock_trace.request { printf("%d %s %d\n", pid(), execname(), 
 # Histogram of storage I/O request size (bytes):
 stap -ve 'global a; probe ioblock_trace.request { a <<< size; } probe end { print(@hist_log(a)); }'
  
+# Histogram of storage I/O request size, using kernel tracepoint (bytes):
+stap -ve 'global a; probe kernel.trace("block_rq_insert") { a <<< $rq->__data_len; } probe end { print(@hist_log(a)); }'
+
+# Histogram of storage I/O kernel queueing time (nanoseconds), using built-in timestamps:
+stap -ve 'global a; probe kernel.trace("block_rq_complete") { a <<< $rq->io_start_time_ns - $rq->start_time_ns; } probe end { print(@hist_log(a)); }'
+
 # Count major faults by process name:
 stap -ve 'global a; probe perf.sw.page_faults_maj { a[execname()] <<< 1; }'
 
