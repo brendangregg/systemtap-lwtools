@@ -7,6 +7,9 @@ accept2close-nd \- trace process signals. Uses Linux SystemTap (non-debuginfo).
 .SH DESCRIPTION
 This traces socket duration from the accept() syscall to close(), and provides
 details on the lifespan of these passive connections.
+
+NOTE: This will miss sockets that are opened by one process, and then closed
+by another (eg, sshd).
 .SH REQUIREMENTS
 SystemTap.
 .SH OPTIONS
