@@ -3,7 +3,6 @@
 bitesize-nd \- Measure block I/O size distribution. Uses Linux SystemTap (non-debuginfo).
 .SH SYNOPSIS
 .B bitesize-nd.stp
-[interval [count]]
 .SH DESCRIPTION
 This uses the kernel tracepoint block_rq_insert to read the size of I/O. The
 output includes the name of the process or thread that was on-CPU when the I/O
