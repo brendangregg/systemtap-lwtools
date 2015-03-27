@@ -1,0 +1,58 @@
+.TH weblatency-nd 8  "2015-01-30" "USER COMMANDS"
+.SH NAME
+weblatency-nd \- Trace HTTP GETs and their latency (sendto()->recvfrom()). Uses Linux SystemTap (non-debuginfo).
+.SH SYNOPSIS
+.B weblatency-nd.stp
+.SH DESCRIPTION
+This measures HTTP GET time-to-first-byte latency by tracing client syscalls,
+and shows statistics including average latency, maximum latency, and latency
+distribution, by both PID and URL. This can be useful to understand application
+level latency when it makes requests to other services. The latency distribution
+is useful for understanding the make-up of latency, and whether there are
+multiple modes or queueing effects present, which can direct further performance
+tuning efforts.
+
+weblatency-nd.stp works by tracing the entry to the sendto() syscall, and
+matching on the string "GET" at the start of the message, and then timing how
+long it takes for a recvfrom() to complete on the same file descriptor. This
+sequence matches the sample application it was written for, but won't match
+all: applications can use a write()->read() sequence instead on a socket
+file descriptor. Adjust the script as needed.
+
+It's common to analyze this latency by taking a tcpdump(1), and post-processing.
+An advantage of weblatency-nd.stp is that the data is filtered and summarized
+in-kernel, lowering the overheads of doing this task.
+.SH REQUIREMENTS
+SystemTap.
+.SH EXAMPLES
+.TP
+Measure HTTP GET time-to-first-byte latency, and show statistics by-URL on Ctrl-C:
+#
+.B weblatency-nd.stp
+.SH FIELDS
+.TP
+value
+The minimum value, in nanoseconds, for this histogram bucket. Read this value
+as "HTTP GET latency was at least xxx".
+.TP
+count
+How many GETs fell into this latency range.
+.SH OVERHEAD
+It depends on the rate of sendto()/recvfrom() syscalls, which for busy web
+servers can be frequent, and the overhead of this tool may be noticeable.
+Test first.
+.SH SOURCE
+This is from the SystemTap lwtools collection.
+.IP
+https://github.com/brendangregg/systemtap-lwtools
+.PP
+Also look under the examples directory for a text file containing example
+usage, output, and commentary for this tool.
+.SH OS
+Linux
+.SH STABILITY
+Unstable - in development.
+.SH AUTHOR
+Brendan Gregg
+.SH SEE ALSO
+tcpdump(1)

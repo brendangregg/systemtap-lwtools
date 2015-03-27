@@ -1,0 +1,66 @@
+#!/usr/bin/stap
+/*
+ * weblatency-nd.stp	Trace HTTP GETs and their latency.
+ *			For Linux, uses SystemTap (non-debuginfo).
+ *
+ * This currently measures sendto()->recvfrom() latency. If your app uses
+ * different syscalls for this, adjust as necessary. Eg, adding probes
+ * for write()->read() is easy; it's a bit harder to do this in an
+ * efficient manner -- only tracing sockets -- without debuginfo.
+ *
+ * Copyright (C) 2015 Brendan Gregg.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * 25-Mar-2015	Brendan Gregg	Created this.
+ */
+
+global ts[8192];	# max concurrent requests
+global url[8192];
+global lat;
+
+probe begin
+{
+	printf("Tracing sendto()->recvfrom()... Hit Ctrl-C to end.\n");
+}
+
+/* socket writes */
+probe nd_syscall.sendto
+{
+	msg = user_string2(pointer_arg(2), "-");
+	if (isinstr(msg, "GET")) {
+		url[pid(), uint_arg(1)] =
+		    tokenize(substr(msg, 4, strlen(msg) - 4), " ");
+		ts[pid(), uint_arg(1)] = gettimeofday_ns();
+	}
+}
+
+/* socket reads */
+probe nd_syscall.recvfrom.return
+{
+	fd = @entry(uint_arg(1));
+	prev = ts[pid(), fd];
+	if (prev != 0) {
+		lat[pid(), url[pid(), fd]] <<<
+		    (gettimeofday_ns() - prev) / 1000;
+	}
+}
+
+probe end
+{
+	printf("statistics:\n");
+	foreach ([p, u] in lat+) {
+		printf("PID: %-5d URL: %s\n", p, u);
+		printf("count: %d, avg: %d us, max: %d us, dist (us):\n",
+		    @count(lat[p, u]), @avg(lat[p, u]), @max(lat[p, u]));
+		print(@hist_log(lat[p, u]));
+	}
+}

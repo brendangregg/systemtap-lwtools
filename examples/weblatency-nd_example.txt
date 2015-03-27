@@ -1,0 +1,62 @@
+Examples of weblatency-nd.stp, the Linux SystemTap version.
+
+
+This measures HTTP GET time-to-first-byte latency by tracing client syscalls.
+Here is some output, showing a benchmark that is testing three different pages
+on a web server:
+
+# ./weblatency-nd.stp 
+Tracing sendto()->recvfrom()... Hit Ctrl-C to end.
+^Cstatistics:
+PID: 12739 URL: /benchmark/page3
+count: 7615, avg: 154375 us, max: 199043 us, dist (us):
+ value |-------------------------------------------------- count
+ 32768 |                                                      0
+ 65536 |                                                      0
+131072 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  7615
+262144 |                                                      0
+524288 |                                                      0
+
+PID: 12739 URL: /benchmark/page1
+count: 7831, avg: 8017 us, max: 59878 us, dist (us):
+ value |-------------------------------------------------- count
+   512 |                                                      0
+  1024 |                                                      0
+  2048 |                                                      5
+  4096 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  5430
+  8192 |@@@@@@@@@@@@@@@@@                                  1954
+ 16384 |@@@                                                 341
+ 32768 |                                                    101
+ 65536 |                                                      0
+131072 |                                                      0
+
+PID: 12739 URL: /benchmark/page2
+count: 8161, avg: 4296 us, max: 55055 us, dist (us):
+ value |-------------------------------------------------- count
+   256 |                                                      0
+   512 |                                                      0
+  1024 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  3373
+  2048 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                     2102
+  4096 |@@@@@@@@@@@@@@@@@@@@@@@                            1582
+  8192 |@@@@@@@@@@@@@                                       933
+ 16384 |@                                                   114
+ 32768 |                                                     57
+ 65536 |                                                      0
+131072 |                                                      0
+
+The PID and URL for the HTTP GETs are shown, along with various statistics.
+For example, the last group of output shows that the /benchmark/page2 URL was
+fetched 8161 times while tracing, taking an average of 4296 us (4.3 ms) per
+request. The distribution of latency is also shown, which reveals that this
+is as fast as the 1-2 ms bucket, and then tails off. Just given a 4.3 ms mean,
+you might have assumed a normal (bell shaped) distribution -- and you'd have
+been wrong. The distribution suggests queueing, and the average is dragged
+high by the tail of the queue.
+
+weblatency-nd.stp works by tracing the entry to the sendto() syscall, and
+matching on the string "GET" at the start of the message, and then timing how
+long it takes for a recvfrom() to complete on the same file descriptor. This
+sequence matches the application I was analyzing at the time, but won't match
+all: applications can use a write()->read() sequence instead on a socket
+file descriptor. Adjust the script as needed.
+
