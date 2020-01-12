@@ -11,7 +11,7 @@ stap -L 'nd_syscall.*'
 stap -L 'kernel.trace("*")'
 
 # Trace new processes (via exec() only), showing arguments:
-stap -ve 'probe nd_syscall.execve.return { println(cmdline_str(); }'
+stap -ve 'probe nd_syscall.execve.return { println(cmdline_str()); }'
 
 # Trace new processes (via exec() only), showing time and arguments:
 stap -ve 'probe nd_syscall.execve.return { printf("%s %s\n", ctime(gettimeofday_s()), cmdline_str()); }'
